@@ -1,11 +1,12 @@
-import 'package:emr_app/features/auth/domain/entities/auth_session.dart';
-import 'package:emr_app/features/auth/domain/entities/user.dart';
-
+// LoginResponse is a pure Data Transfer Object (DTO).
+// Its only job is to hold the raw data that the API returned.
+// It does NOT know anything about the domain. No domain imports.
+// The adapter (AuthRepositoryImpl) is responsible for converting this to a domain object.
 class LoginResponse {
   final String userId;
   final String userName;
   final String email;
-  final UserRole role;
+  final String role; // raw string from API, e.g. "doctor", "patient", "admin"
   final String token;
   final bool isActive;
 
@@ -20,19 +21,12 @@ class LoginResponse {
 
   factory LoginResponse.fromJson(Map<String, dynamic> json) {
     return LoginResponse(
-      userId: json['userId'],
-      userName: json['userName'],
-      email: json['email'],
-      role: UserRole.fromString(json['roleName']),
-      token: json['token'],
-      isActive: json['isActive'] ?? false,
-    );
-  }
-
-  AuthSession toDomain() {
-    return AuthSession(
-      user: User(userId: userId, userName: userName, email: email, role: role),
-      token: token,
+      userId: json['userId'] as String,
+      userName: json['userName'] as String,
+      email: json['email'] as String,
+      role: json['roleName'] as String? ?? '',
+      token: json['token'] as String,
+      isActive: json['isActive'] as bool? ?? false,
     );
   }
 }

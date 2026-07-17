@@ -8,6 +8,20 @@ class AuthRepositoryImpl implements AuthRepository {
 
   AuthRepositoryImpl(this.remote);
 
+  // Helper: converts a raw LoginResponse DTO into the domain AuthSession.
+  // This mapping belongs here in the adapter — not inside the DTO.
+  AuthSession _toSession(dynamic response) {
+    return AuthSession(
+      user: User(
+        userId: response.userId,
+        userName: response.userName,
+        email: response.email,
+        role: UserRole.fromString(response.role),
+      ),
+      token: response.token,
+    );
+  }
+
   @override
   Future<AuthSession> loginWithUserNameAndPassword({
     required String userName,
@@ -15,7 +29,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }) async {
     final response = await remote.login(userName, password);
 
-    return response.toDomain();
+    return _toSession(response);
   }
 
   @override
@@ -31,7 +45,7 @@ class AuthRepositoryImpl implements AuthRepository {
       userId: response.userId,
       userName: response.userName,
       email: response.email,
-      role: response.role,
+      role: UserRole.fromString(response.role), // map raw String → domain enum here
     );
   }
 
@@ -46,7 +60,7 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<AuthSession> loginWithToken({required String token}) async {
     final response = await remote.loginWithToken(token);
 
-    return response.toDomain();
+    return _toSession(response);
   }
 
   @override

@@ -1,10 +1,12 @@
-import 'package:emr_app/features/auth/domain/entities/user.dart';
-
+// SignupResponse is a pure Data Transfer Object (DTO).
+// Its only job is to hold the raw data that the API returned.
+// It does NOT know anything about the domain. No domain imports.
+// The adapter (AuthRepositoryImpl) is responsible for converting this to a domain object.
 class SignupResponse {
   final String userId;
   final String userName;
   final String email;
-  final UserRole role;
+  final String role; // raw string from API, e.g. "doctor", "patient", "admin"
   final bool isActive;
 
   const SignupResponse({
@@ -20,22 +22,8 @@ class SignupResponse {
       userId: json['userId'] as String,
       userName: json['userName'] as String,
       email: json['email'] as String,
-      role: UserRole.fromString(json['roleName'] as String? ?? ''),
+      role: json['roleName'] as String? ?? '',
       isActive: json['isActive'] as bool? ?? false,
     );
-  }
-
-  User toDomain() {
-    return User(userId: userId, userName: userName, email: email, role: role);
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'userId': userId,
-      'userName': userName,
-      'email': email,
-      'roleName': role.name,
-      'isActive': isActive,
-    };
   }
 }
