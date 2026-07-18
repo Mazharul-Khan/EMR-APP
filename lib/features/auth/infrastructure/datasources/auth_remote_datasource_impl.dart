@@ -1,7 +1,7 @@
 import 'package:emr_app/features/auth/infrastructure/datasources/auth_remote_datasource.dart';
 import 'package:emr_app/features/auth/infrastructure/models/login_response.dart';
 import 'package:emr_app/features/auth/infrastructure/models/signup_response.dart';
-import 'package:emr_app/features/auth/infrastructure/services/api_client.dart';
+import 'package:emr_app/core/network/api_client.dart';
 
 class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   final ApiClient api;
