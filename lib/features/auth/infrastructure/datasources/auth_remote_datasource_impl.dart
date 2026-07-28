@@ -38,7 +38,10 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
 
   @override
   Future<String> logOut(String token) async {
-    final response = await api.dio.post("auth/logout", data: {"token": token});
+    final response = await api.dio.post(
+      "auth/logout",
+      queryParameters: {"token": token},
+    );
     return response.data.toString();
   }
 
@@ -46,7 +49,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   Future<LoginResponse> loginWithToken(String token) async {
     final response = await api.dio.post(
       "auth/validate",
-      data: {"token": token},
+      queryParameters: {"token": token},
     );
     return LoginResponse.fromJson(response.data);
   }

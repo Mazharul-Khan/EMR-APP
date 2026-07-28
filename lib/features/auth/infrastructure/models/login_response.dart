@@ -19,14 +19,23 @@ class LoginResponse {
     required this.isActive,
   });
 
-  factory LoginResponse.fromJson(Map<String, dynamic> json) {
+  factory LoginResponse.fromJson(Map<String, dynamic> rawJson) {
+    // Handle nested payload if API wraps data under 'data' or 'result' key
+    final json = (rawJson.containsKey('data') && rawJson['data'] is Map<String, dynamic>)
+        ? rawJson['data'] as Map<String, dynamic>
+        : (rawJson.containsKey('result') && rawJson['result'] is Map<String, dynamic>)
+            ? rawJson['result'] as Map<String, dynamic>
+            : rawJson;
+
     return LoginResponse(
-      userId: json['userId'] as String,
-      userName: json['userName'] as String,
-      email: json['email'] as String,
-      role: json['roleName'] as String? ?? '',
-      token: json['token'] as String,
-      isActive: json['isActive'] as bool? ?? false,
+      userId: (json['userId'] ?? json['id'] ?? '').toString(),
+      userName: (json['userName'] ?? json['username'] ?? '').toString(),
+      email: (json['email'] ?? '').toString(),
+      role: (json['roleName'] ?? json['role'] ?? '').toString(),
+      token: (json['token'] ?? json['accessToken'] ?? json['jwt'] ?? '').toString(),
+      isActive: json['isActive'] is bool
+          ? json['isActive'] as bool
+          : (json['isActive']?.toString().toLowerCase() == 'true'),
     );
   }
 }

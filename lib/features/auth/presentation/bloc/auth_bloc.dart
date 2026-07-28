@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:emr_app/features/auth/domain/usecases/login_usecase.dart';
 import 'package:emr_app/features/auth/domain/usecases/login_with_token_usecase.dart';
 import 'package:emr_app/features/auth/domain/usecases/signup_usecase.dart';
@@ -33,9 +35,30 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       final session = await _loginUsecase.call(event.userName, event.password);
       emit(AuthSuccess(session: session));
-    } catch (e) {
-      emit(AuthFailure(errorMessage: e.toString()));
+    } catch (e, stackTrace) {
+      debugPrint('❌ [AUTH BLOC ERROR] Login Exception: $e');
+      debugPrint('📜 [STACK TRACE] $stackTrace');
+      emit(AuthFailure(errorMessage: _parseErrorMessage(e)));
     }
+  }
+
+  String _parseErrorMessage(dynamic error) {
+    if (error is DioException) {
+      if (error.response != null) {
+        final data = error.response?.data;
+        if (data is Map && data.containsKey('message')) {
+          return data['message'].toString();
+        }
+        return 'Server Error (${error.response?.statusCode}): ${error.response?.statusMessage ?? data}';
+      } else if (error.type == DioExceptionType.connectionTimeout ||
+          error.type == DioExceptionType.receiveTimeout) {
+        return 'Connection timeout. Please check your backend server.';
+      } else if (error.type == DioExceptionType.connectionError) {
+        return 'Cannot connect to backend server. Ensure backend is running and URL is reachable.';
+      }
+      return 'Network error: ${error.message}';
+    }
+    return error.toString();
   }
 
   Future<void> _onSignupSubmitted(
