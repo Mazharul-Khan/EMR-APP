@@ -1,15 +1,15 @@
 import 'package:emr_app/features/auth/domain/entities/auth_session.dart';
 import 'package:emr_app/features/auth/domain/entities/user.dart';
 import 'package:emr_app/features/auth/domain/ports/auth_repository.dart';
+import 'package:emr_app/features/auth/infrastructure/datasources/auth_local_datasource.dart';
 import 'package:emr_app/features/auth/infrastructure/datasources/auth_remote_datasource.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDatasource remote;
+  final AuthLocalDatasource localDatasource;
 
-  AuthRepositoryImpl(this.remote);
+  AuthRepositoryImpl(this.remote, this.localDatasource);
 
-  // Helper: converts a raw LoginResponse DTO into the domain AuthSession.
-  // This mapping belongs here in the adapter — not inside the DTO.
   AuthSession _toSession(dynamic response) {
     return AuthSession(
       user: User(
@@ -29,6 +29,8 @@ class AuthRepositoryImpl implements AuthRepository {
   }) async {
     final response = await remote.login(userName, password);
 
+    localDatasource.cacheToken(response.token);
+
     return _toSession(response);
   }
 
@@ -45,13 +47,17 @@ class AuthRepositoryImpl implements AuthRepository {
       userId: response.userId,
       userName: response.userName,
       email: response.email,
-      role: UserRole.fromString(response.role), // map raw String → domain enum here
+      role: UserRole.fromString(
+        response.role,
+      ), // map raw String → domain enum here
     );
   }
 
   @override
   Future<String> logOut({required String token}) async {
     final response = await remote.logOut(token);
+
+    localDatasource.clearToken(token);
 
     return response.toString();
   }
@@ -67,5 +73,11 @@ class AuthRepositoryImpl implements AuthRepository {
   Stream<User?> getCurrentUser() {
     // TODO: implement getCurrentUser
     throw UnimplementedError();
+  }
+
+  @override
+  Future<String?> getCachedToken() {
+    final response = localDatasource.getToken();
+    return response;
   }
 }

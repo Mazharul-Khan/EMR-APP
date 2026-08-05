@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:emr_app/features/auth/domain/usecases/get_cached_token_usecase.dart';
 import 'package:flutter/foundation.dart';
 import 'package:emr_app/features/auth/domain/usecases/login_usecase.dart';
 import 'package:emr_app/features/auth/domain/usecases/login_with_token_usecase.dart';
@@ -11,19 +12,23 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final LoginUsecase _loginUsecase;
   final SignupUsecase _signupUsecase;
   final LoginWithTokenUsecase _loginWithTokenUsecase;
+  final GetCachedTokenUsecase _getCachedTokenUsecase;
 
   AuthBloc({
     required LoginUsecase loginUsecase,
     required SignupUsecase signupUsecase,
     required LoginWithTokenUsecase loginWithTokenUsecase,
+    required GetCachedTokenUsecase cachedTokenUsecase,
   }) : _loginUsecase = loginUsecase,
        _signupUsecase = signupUsecase,
        _loginWithTokenUsecase = loginWithTokenUsecase,
+       _getCachedTokenUsecase = cachedTokenUsecase,
        super(AuthInitial()) {
     on<LoginSubmitted>(_onLoginSubmitted);
     on<SignupSubmitted>(_onSignupSubmitted);
     on<LoginWithTokenRequested>(_onLoginWithTokenRequested);
     on<LogoutRequested>(_onLogoutRequested);
+    on<CheckAuthStatus>(_checkAuthStatus);
   }
 
   Future<void> _onLoginSubmitted(
@@ -94,5 +99,23 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   void _onLogoutRequested(LogoutRequested event, Emitter<AuthState> emit) {
     emit(AuthInitial());
+  }
+
+  Future<void> _checkAuthStatus(
+    CheckAuthStatus event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+    try {
+      final authToken = await _getCachedTokenUsecase.call();
+      if (authToken == null || authToken.isEmpty) {
+        emit(AuthInitial());
+        return;
+      }
+      final session = await _loginWithTokenUsecase.call(authToken);
+      emit(AuthSuccess(session: session));
+    } catch (e) {
+      emit(AuthInitial());
+    }
   }
 }

@@ -19,4 +19,6 @@ abstract interface class AuthRepository {
   });
 
   Future<String> logOut({required String token});
+
+  Future<String?> getCachedToken();
 }
