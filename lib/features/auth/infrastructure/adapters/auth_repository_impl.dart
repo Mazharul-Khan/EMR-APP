@@ -26,11 +26,15 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<AuthSession> loginWithUserNameAndPassword({
     required String userName,
     required String password,
+    bool rememberMe = false,
   }) async {
     final response = await remote.login(userName, password);
 
-    localDatasource.cacheToken(response.token);
-
+    if (rememberMe) {
+      await localDatasource.cacheToken(response.token);
+    } else {
+      await localDatasource.clearToken(response.token);
+    }
     return _toSession(response);
   }
 
@@ -55,11 +59,12 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<String> logOut({required String token}) async {
-    final response = await remote.logOut(token);
-
-    localDatasource.clearToken(token);
-
-    return response.toString();
+    try {
+      final response = await remote.logOut(token);
+      return response.toString();
+    } finally {
+      await localDatasource.clearToken(token);
+    }
   }
 
   @override

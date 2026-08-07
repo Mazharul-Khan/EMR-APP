@@ -2,6 +2,7 @@ import 'package:emr_app/core/themes/app_colors.dart';
 import 'package:emr_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:emr_app/features/auth/presentation/bloc/auth_event.dart';
 import 'package:emr_app/features/auth/presentation/bloc/auth_state.dart';
+import 'package:emr_app/features/home/presentation/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -41,6 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
         LoginSubmitted(
           userName: _usernameContoller.text.trim(),
           password: _passwordController.text,
+          rememberMe: _rememberMe,
         ),
       );
     } else {
@@ -223,9 +225,14 @@ class _LoginScreenState extends State<LoginScreen> {
           );
         } else if (state is AuthSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
+            const SnackBar(
               content: Text('Sign In Successful'),
               backgroundColor: Colors.green,
+            ),
+          );
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => HomeScreen(session: state.session),
             ),
           );
         }

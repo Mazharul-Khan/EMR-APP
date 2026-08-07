@@ -6,10 +6,11 @@ class LoginUsecase {
 
   LoginUsecase(this.repository);
 
-  Future<AuthSession> call(String userName, String password) {
+  Future<AuthSession> call(String userName, String password, bool rememberMe) {
     return repository.loginWithUserNameAndPassword(
       userName: userName,
       password: password,
+      rememberMe: rememberMe,
     );
   }
 }

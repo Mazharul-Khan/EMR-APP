@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:emr_app/features/auth/domain/usecases/get_cached_token_usecase.dart';
+import 'package:emr_app/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:flutter/foundation.dart';
 import 'package:emr_app/features/auth/domain/usecases/login_usecase.dart';
 import 'package:emr_app/features/auth/domain/usecases/login_with_token_usecase.dart';
@@ -13,16 +14,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final SignupUsecase _signupUsecase;
   final LoginWithTokenUsecase _loginWithTokenUsecase;
   final GetCachedTokenUsecase _getCachedTokenUsecase;
+  final LogoutUsecase _logoutUsecase;
 
   AuthBloc({
     required LoginUsecase loginUsecase,
     required SignupUsecase signupUsecase,
     required LoginWithTokenUsecase loginWithTokenUsecase,
     required GetCachedTokenUsecase cachedTokenUsecase,
+    required LogoutUsecase logoutUsecase,
   }) : _loginUsecase = loginUsecase,
        _signupUsecase = signupUsecase,
        _loginWithTokenUsecase = loginWithTokenUsecase,
        _getCachedTokenUsecase = cachedTokenUsecase,
+       _logoutUsecase = logoutUsecase,
        super(AuthInitial()) {
     on<LoginSubmitted>(_onLoginSubmitted);
     on<SignupSubmitted>(_onSignupSubmitted);
@@ -38,7 +42,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
 
     try {
-      final session = await _loginUsecase.call(event.userName, event.password);
+      final session = await _loginUsecase.call(
+        event.userName,
+        event.password,
+        event.rememberMe,
+      );
       emit(AuthSuccess(session: session));
     } catch (e, stackTrace) {
       debugPrint('❌ [AUTH BLOC ERROR] Login Exception: $e');
@@ -97,8 +105,25 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  void _onLogoutRequested(LogoutRequested event, Emitter<AuthState> emit) {
-    emit(AuthInitial());
+  Future<void> _onLogoutRequested(
+    LogoutRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    try {
+      String? token;
+      if (state is AuthSuccess) {
+        token = (state as AuthSuccess).session.token;
+      }
+      token ??= await _getCachedTokenUsecase.call();
+
+      if (token != null && token.isNotEmpty) {
+        await _logoutUsecase.call(token);
+      }
+    } catch (e) {
+      debugPrint('⚠️ [AUTH BLOC WARNING] Error during logout API call: $e');
+    } finally {
+      emit(AuthInitial());
+    }
   }
 
   Future<void> _checkAuthStatus(

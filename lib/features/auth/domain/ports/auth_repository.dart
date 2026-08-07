@@ -7,6 +7,7 @@ abstract interface class AuthRepository {
   Future<AuthSession> loginWithUserNameAndPassword({
     required String userName,
     required String password,
+    required bool rememberMe,
   });
 
   Future<AuthSession> loginWithToken({required String token});

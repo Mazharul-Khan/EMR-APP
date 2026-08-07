@@ -3,8 +3,13 @@ abstract class AuthEvent {}
 class LoginSubmitted extends AuthEvent {
   final String userName;
   final String password;
+  final bool rememberMe;
 
-  LoginSubmitted({required this.userName, required this.password});
+  LoginSubmitted({
+    required this.userName,
+    required this.password,
+    this.rememberMe = false,
+  });
 }
 
 class SignupSubmitted extends AuthEvent {
