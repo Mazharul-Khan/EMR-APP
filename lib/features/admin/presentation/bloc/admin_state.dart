@@ -14,6 +14,7 @@ class AdminLoaded extends AdminState {
   final String searchQuery;
   final bool isActionLoading;
   final String? successMessage;
+  final String? errorMessage;
 
   const AdminLoaded({
     required this.users,
@@ -21,6 +22,7 @@ class AdminLoaded extends AdminState {
     this.searchQuery = '',
     this.isActionLoading = false,
     this.successMessage,
+    this.errorMessage,
   });
 
   int get totalUsers => users.length;
@@ -37,6 +39,7 @@ class AdminLoaded extends AdminState {
     String? searchQuery,
     bool? isActionLoading,
     String? successMessage,
+    String? errorMessage,
   }) {
     return AdminLoaded(
       users: users ?? this.users,
@@ -44,6 +47,7 @@ class AdminLoaded extends AdminState {
       searchQuery: searchQuery ?? this.searchQuery,
       isActionLoading: isActionLoading ?? this.isActionLoading,
       successMessage: successMessage,
+      errorMessage: errorMessage,
     );
   }
 }

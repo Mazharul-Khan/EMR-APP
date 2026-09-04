@@ -247,11 +247,12 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           clipBehavior: Clip.antiAlias,
           color: Colors.white,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: EdgeInsets.all(40),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(40),
                 child: Form(
                   key: _formkey,
                   child: Column(
@@ -525,8 +526,9 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ],
           ),
-        );
-      },
+        ),
+      );
+    },
     );
   }
 
@@ -534,53 +536,67 @@ class _LoginScreenState extends State<LoginScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
       color: const Color.fromARGB(255, 224, 224, 224),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Text(
-            'Version 1.0.0   |   © 2025 Your Organization',
-            style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
-          ),
-          Row(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isCompact = constraints.maxWidth < 950;
+          if (isCompact) {
+            return const Center(
+              child: Text(
+                'Version 1.0.0   |   © 2025 EMR System',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+              ),
+            );
+          }
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Icon(Icons.language, size: 16, color: Color(0xFF64748B)),
-              const SizedBox(width: 6),
               const Text(
-                'English',
+                'Version 1.0.0   |   © 2025 Your Organization',
                 style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
               ),
-              const Icon(
-                Icons.arrow_drop_down,
-                size: 18,
-                color: Color(0xFF64748B),
-              ),
-              const SizedBox(width: 20),
-              const Text(' | ', style: TextStyle(color: Color(0xFFCBD5E1))),
-              const SizedBox(width: 20),
-              const Icon(
-                Icons.help_outline,
-                size: 16,
-                color: Color(0xFF64748B),
-              ),
-              const SizedBox(width: 6),
-              const Text(
-                'Help',
-                style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
-              ),
-              const SizedBox(width: 20),
-              const Icon(
-                Icons.headset_mic_outlined,
-                size: 16,
-                color: Color(0xFF64748B),
-              ),
-              const SizedBox(width: 6),
-              const Text(
-                'Contact Support',
-                style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+              Row(
+                children: [
+                  const Icon(Icons.language, size: 16, color: Color(0xFF64748B)),
+                  const SizedBox(width: 6),
+                  const Text(
+                    'English',
+                    style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                  ),
+                  const Icon(
+                    Icons.arrow_drop_down,
+                    size: 18,
+                    color: Color(0xFF64748B),
+                  ),
+                  const SizedBox(width: 20),
+                  const Text(' | ', style: TextStyle(color: Color(0xFFCBD5E1))),
+                  const SizedBox(width: 20),
+                  const Icon(
+                    Icons.help_outline,
+                    size: 16,
+                    color: Color(0xFF64748B),
+                  ),
+                  const SizedBox(width: 6),
+                  const Text(
+                    'Help',
+                    style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                  ),
+                  const SizedBox(width: 20),
+                  const Icon(
+                    Icons.headset_mic_outlined,
+                    size: 16,
+                    color: Color(0xFF64748B),
+                  ),
+                  const SizedBox(width: 6),
+                  const Text(
+                    'Contact Support',
+                    style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                  ),
+                ],
               ),
             ],
-          ),
-        ],
+          );
+        },
       ),
     );
   }

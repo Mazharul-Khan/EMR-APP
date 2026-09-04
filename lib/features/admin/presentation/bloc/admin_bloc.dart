@@ -69,7 +69,12 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
         ),
       );
     } catch (e) {
-      emit(AdminError(e.toString().replaceAll('Exception: ', '')));
+      emit(
+        currentState.copyWith(
+          isActionLoading: false,
+          errorMessage: e.toString().replaceAll('Exception: ', ''),
+        ),
+      );
     }
   }
 
@@ -104,7 +109,12 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
         ),
       );
     } catch (e) {
-      emit(AdminError(e.toString().replaceAll('Exception: ', '')));
+      emit(
+        currentState.copyWith(
+          isActionLoading: false,
+          errorMessage: e.toString().replaceAll('Exception: ', ''),
+        ),
+      );
     }
   }
 

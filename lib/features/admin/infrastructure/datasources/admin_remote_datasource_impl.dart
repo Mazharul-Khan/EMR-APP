@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:emr_app/core/network/api_client.dart';
 import 'package:emr_app/features/admin/infrastructure/datasources/admin_remote_datasource.dart';
 import 'package:emr_app/features/admin/infrastructure/models/admin_user_model.dart';
+import 'package:emr_app/features/auth/infrastructure/models/signup_response.dart';
 
 class AdminRemoteDatasourceImpl implements AdminRemoteDatasource {
   final ApiClient apiClient;
@@ -58,7 +59,7 @@ class AdminRemoteDatasourceImpl implements AdminRemoteDatasource {
   }
 
   @override
-  Future<AdminUserModel> createUser(
+  Future<SignupResponse> createUser(
     String token,
     String userName,
     String email,
@@ -79,7 +80,7 @@ class AdminRemoteDatasourceImpl implements AdminRemoteDatasource {
       final Map<String, dynamic> data = (body is Map && body['data'] is Map)
           ? body['data'] as Map<String, dynamic>
           : (body as Map<String, dynamic>);
-      return AdminUserModel.fromJson(data);
+      return SignupResponse.fromJson(data);
     } on DioException catch (e) {
       final errorMsg =
           e.response?.data?['message'] ?? e.message ?? 'Failed to create user';

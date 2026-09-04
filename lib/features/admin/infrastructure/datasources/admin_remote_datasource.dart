@@ -1,4 +1,5 @@
 import 'package:emr_app/features/admin/infrastructure/models/admin_user_model.dart';
+import 'package:emr_app/features/auth/infrastructure/models/signup_response.dart';
 
 abstract class AdminRemoteDatasource {
   Future<List<AdminUserModel>> getAllUsers(String token);
@@ -9,7 +10,7 @@ abstract class AdminRemoteDatasource {
     bool isActive,
   );
 
-  Future<AdminUserModel> createUser(
+  Future<SignupResponse> createUser(
     String token,
     String userName,
     String email,

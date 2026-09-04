@@ -26,7 +26,7 @@ class PatientHomeScreen extends StatelessWidget {
               width: 32,
               height: 32,
               fit: BoxFit.contain,
-              errorBuilder: (_, __, ___) =>
+              errorBuilder: (context, error, stackTrace) =>
                   const Icon(Icons.favorite, color: AppColors.lightTeal),
             ),
             const SizedBox(width: 10),
@@ -61,7 +61,7 @@ class PatientHomeScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.04),
+                color: Colors.black.withValues(alpha: 0.04),
                 blurRadius: 16,
                 offset: const Offset(0, 4),
               ),
@@ -73,7 +73,7 @@ class PatientHomeScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.lightTeal.withOpacity(0.1),
+                  color: AppColors.lightTeal.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(

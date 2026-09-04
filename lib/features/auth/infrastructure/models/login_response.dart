@@ -1,41 +1,41 @@
-// LoginResponse is a pure Data Transfer Object (DTO).
-// Its only job is to hold the raw data that the API returned.
-// It does NOT know anything about the domain. No domain imports.
-// The adapter (AuthRepositoryImpl) is responsible for converting this to a domain object.
+/// DTO directly mirroring Spring Boot's `SaveAuthTokenResponse.java` from `POST /auth/login`.
 class LoginResponse {
+  final String tokenId;
   final String userId;
-  final String userName;
-  final String email;
-  final String role; // raw string from API, e.g. "doctor", "patient", "admin"
   final String token;
-  final bool isActive;
+  final DateTime? expiresAt;
+  final bool active;
 
   const LoginResponse({
+    required this.tokenId,
     required this.userId,
-    required this.userName,
-    required this.email,
-    required this.role,
     required this.token,
-    required this.isActive,
+    required this.expiresAt,
+    required this.active,
   });
 
   factory LoginResponse.fromJson(Map<String, dynamic> rawJson) {
-    // Handle nested payload if API wraps data under 'data' or 'result' key
-    final json = (rawJson.containsKey('data') && rawJson['data'] is Map<String, dynamic>)
+    final data = rawJson['data'] is Map<String, dynamic>
         ? rawJson['data'] as Map<String, dynamic>
-        : (rawJson.containsKey('result') && rawJson['result'] is Map<String, dynamic>)
-            ? rawJson['result'] as Map<String, dynamic>
-            : rawJson;
+        : rawJson;
 
     return LoginResponse(
-      userId: (json['userId'] ?? json['id'] ?? '').toString(),
-      userName: (json['userName'] ?? json['username'] ?? '').toString(),
-      email: (json['email'] ?? '').toString(),
-      role: (json['roleName'] ?? json['role'] ?? '').toString(),
-      token: (json['token'] ?? json['accessToken'] ?? json['jwt'] ?? '').toString(),
-      isActive: json['isActive'] is bool
-          ? json['isActive'] as bool
-          : (json['isActive']?.toString().toLowerCase() == 'true'),
+      tokenId: (data['tokenId'] ?? '').toString(),
+      userId: (data['userId'] ?? '').toString(),
+      token: (data['token'] ?? '').toString(),
+      active: data['active'] as bool? ?? false,
+      expiresAt: _parseTimestamp(data['expiresAt']),
     );
+  }
+
+  static DateTime? _parseTimestamp(dynamic value) {
+    if (value == null) return null;
+    if (value is String) return DateTime.tryParse(value);
+    if (value is int) {
+      return value > 100000000000
+          ? DateTime.fromMillisecondsSinceEpoch(value)
+          : DateTime.fromMillisecondsSinceEpoch(value * 1000);
+    }
+    return null;
   }
 }

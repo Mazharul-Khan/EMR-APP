@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:emr_app/features/auth/domain/usecases/get_cached_token_usecase.dart';
 import 'package:emr_app/features/auth/domain/usecases/logout_usecase.dart';
@@ -15,6 +16,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final LoginWithTokenUsecase _loginWithTokenUsecase;
   final GetCachedTokenUsecase _getCachedTokenUsecase;
   final LogoutUsecase _logoutUsecase;
+
+  Timer? _tokenExpiryTimer;
 
   AuthBloc({
     required LoginUsecase loginUsecase,
@@ -35,6 +38,27 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<CheckAuthStatus>(_checkAuthStatus);
   }
 
+  void _scheduleExpiryTimer(DateTime? expiresAt) {
+    _tokenExpiryTimer?.cancel();
+    _tokenExpiryTimer = null;
+    if (expiresAt == null) return;
+
+    final remaining = expiresAt.difference(DateTime.now());
+    if (remaining.isNegative) {
+      debugPrint('⏰ [AUTH] Token is already expired! Dispatching logout...');
+      add(LogoutRequested());
+      return;
+    }
+
+    debugPrint(
+      '⏰ [AUTH] Scheduled auto-logout in ${remaining.inSeconds} seconds (${expiresAt.toIso8601String()})',
+    );
+    _tokenExpiryTimer = Timer(remaining, () {
+      debugPrint('⏰ [AUTH] Token lifetime elapsed. Triggering auto-logout...');
+      add(LogoutRequested());
+    });
+  }
+
   Future<void> _onLoginSubmitted(
     LoginSubmitted event,
     Emitter<AuthState> emit,
@@ -47,6 +71,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         event.password,
         event.rememberMe,
       );
+      _scheduleExpiryTimer(session.expiresAt);
       emit(AuthSuccess(session: session));
     } catch (e, stackTrace) {
       debugPrint('❌ [AUTH BLOC ERROR] Login Exception: $e');
@@ -99,6 +124,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
     try {
       final session = await _loginWithTokenUsecase.call(event.token);
+      _scheduleExpiryTimer(session.expiresAt);
       emit(AuthSuccess(session: session));
     } catch (e) {
       emit(AuthFailure(errorMessage: e.toString()));
@@ -109,6 +135,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     LogoutRequested event,
     Emitter<AuthState> emit,
   ) async {
+    _tokenExpiryTimer?.cancel();
+    _tokenExpiryTimer = null;
+
     try {
       String? token;
       if (state is AuthSuccess) {
@@ -138,9 +167,29 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         return;
       }
       final session = await _loginWithTokenUsecase.call(authToken);
+      if (session.isExpired) {
+        debugPrint('⚠️ [AUTH] Cached token is expired. Clearing local token.');
+        await _logoutUsecase.call(authToken);
+        emit(AuthInitial());
+        return;
+      }
+      _scheduleExpiryTimer(session.expiresAt);
       emit(AuthSuccess(session: session));
     } catch (e) {
+      debugPrint('⚠️ [AUTH] Token validation failed: $e. Clearing local cache.');
+      try {
+        final authToken = await _getCachedTokenUsecase.call();
+        if (authToken != null && authToken.isNotEmpty) {
+          await _logoutUsecase.call(authToken);
+        }
+      } catch (_) {}
       emit(AuthInitial());
     }
+  }
+
+  @override
+  Future<void> close() {
+    _tokenExpiryTimer?.cancel();
+    return super.close();
   }
 }

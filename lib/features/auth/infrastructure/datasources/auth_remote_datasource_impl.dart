@@ -1,6 +1,7 @@
 import 'package:emr_app/features/auth/infrastructure/datasources/auth_remote_datasource.dart';
 import 'package:emr_app/features/auth/infrastructure/models/login_response.dart';
 import 'package:emr_app/features/auth/infrastructure/models/signup_response.dart';
+import 'package:emr_app/features/auth/infrastructure/models/validate_token_response.dart';
 import 'package:emr_app/core/network/api_client.dart';
 
 class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
@@ -46,11 +47,13 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   }
 
   @override
-  Future<LoginResponse> loginWithToken(String token) async {
+  Future<ValidateTokenResponse> loginWithToken(String token) async {
     final response = await api.dio.post(
       "auth/validate",
       queryParameters: {"token": token},
     );
-    return LoginResponse.fromJson(response.data);
+    return ValidateTokenResponse.fromJson(
+      response.data as Map<String, dynamic>,
+    );
   }
 }

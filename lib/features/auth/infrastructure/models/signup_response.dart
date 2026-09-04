@@ -1,12 +1,9 @@
-// SignupResponse is a pure Data Transfer Object (DTO).
-// Its only job is to hold the raw data that the API returned.
-// It does NOT know anything about the domain. No domain imports.
-// The adapter (AuthRepositoryImpl) is responsible for converting this to a domain object.
+/// DTO directly mirroring Spring Boot's `SignUpResponse.java` from `POST /auth/signup`.
 class SignupResponse {
   final String userId;
   final String userName;
   final String email;
-  final String role; // raw string from API, e.g. "doctor", "patient", "admin"
+  final String role; // mapped from backend roleName
   final bool isActive;
 
   const SignupResponse({
@@ -17,13 +14,17 @@ class SignupResponse {
     required this.isActive,
   });
 
-  factory SignupResponse.fromJson(Map<String, dynamic> json) {
+  factory SignupResponse.fromJson(Map<String, dynamic> rawJson) {
+    final data = rawJson['data'] is Map<String, dynamic>
+        ? rawJson['data'] as Map<String, dynamic>
+        : rawJson;
+
     return SignupResponse(
-      userId: json['userId'] as String,
-      userName: json['userName'] as String,
-      email: json['email'] as String,
-      role: json['roleName'] as String? ?? '',
-      isActive: json['isActive'] as bool? ?? false,
+      userId: (data['userId'] ?? '').toString(),
+      userName: (data['userName'] ?? '').toString(),
+      email: (data['email'] ?? '').toString(),
+      role: (data['roleName'] ?? '').toString(),
+      isActive: data['active'] as bool? ?? false,
     );
   }
 }

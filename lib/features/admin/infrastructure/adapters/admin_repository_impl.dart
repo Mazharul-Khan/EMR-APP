@@ -36,13 +36,20 @@ class AdminRepositoryImpl implements AdminRepository {
     required String password,
     required UserRole role,
   }) async {
-    final model = await remoteDatasource.createUser(
+    final response = await remoteDatasource.createUser(
       token,
       userName,
       email,
       password,
       role.name,
     );
-    return model.toEntity();
+    return AdminUser(
+      userId: response.userId,
+      userName: response.userName,
+      email: response.email,
+      role: UserRole.fromString(response.role),
+      isActive: response.isActive,
+      createdAt: DateTime.now(),
+    );
   }
 }

@@ -3,6 +3,7 @@ import 'package:emr_app/features/auth/domain/entities/user.dart';
 import 'package:emr_app/features/auth/domain/ports/auth_repository.dart';
 import 'package:emr_app/features/auth/infrastructure/datasources/auth_local_datasource.dart';
 import 'package:emr_app/features/auth/infrastructure/datasources/auth_remote_datasource.dart';
+import 'package:emr_app/features/auth/infrastructure/models/validate_token_response.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDatasource remote;
@@ -10,15 +11,16 @@ class AuthRepositoryImpl implements AuthRepository {
 
   AuthRepositoryImpl(this.remote, this.localDatasource);
 
-  AuthSession _toSession(dynamic response) {
+  AuthSession _toSession(ValidateTokenResponse profile, String token) {
     return AuthSession(
       user: User(
-        userId: response.userId,
-        userName: response.userName,
-        email: response.email,
-        role: UserRole.fromString(response.role),
+        userId: profile.userId,
+        userName: profile.userName,
+        email: profile.email,
+        role: UserRole.fromString(profile.roleName),
       ),
-      token: response.token,
+      token: token,
+      expiresAt: profile.tokenExpiresAt,
     );
   }
 
@@ -28,14 +30,19 @@ class AuthRepositoryImpl implements AuthRepository {
     required String password,
     bool rememberMe = false,
   }) async {
-    final response = await remote.login(userName, password);
+    // 1. Authenticate with backend and obtain active token (SaveAuthTokenResponse)
+    final loginResponse = await remote.login(userName, password);
+
+    // 2. Fetch full user profile & role via validate endpoint (ValidateTokenResponse)
+    final profileResponse = await remote.loginWithToken(loginResponse.token);
 
     if (rememberMe) {
-      await localDatasource.cacheToken(response.token);
+      await localDatasource.cacheToken(loginResponse.token);
     } else {
-      await localDatasource.clearToken(response.token);
+      await localDatasource.clearToken(loginResponse.token);
     }
-    return _toSession(response);
+
+    return _toSession(profileResponse, loginResponse.token);
   }
 
   @override
@@ -51,9 +58,7 @@ class AuthRepositoryImpl implements AuthRepository {
       userId: response.userId,
       userName: response.userName,
       email: response.email,
-      role: UserRole.fromString(
-        response.role,
-      ), // map raw String → domain enum here
+      role: UserRole.fromString(response.role),
     );
   }
 
@@ -69,20 +74,18 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<AuthSession> loginWithToken({required String token}) async {
-    final response = await remote.loginWithToken(token);
+    final profileResponse = await remote.loginWithToken(token);
 
-    return _toSession(response);
+    return _toSession(profileResponse, token);
   }
 
   @override
   Stream<User?> getCurrentUser() {
-    // TODO: implement getCurrentUser
     throw UnimplementedError();
   }
 
   @override
   Future<String?> getCachedToken() {
-    final response = localDatasource.getToken();
-    return response;
+    return localDatasource.getToken();
   }
 }
