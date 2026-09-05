@@ -5,6 +5,7 @@ class SignupResponse {
   final String email;
   final String role; // mapped from backend roleName
   final bool isActive;
+  final String? createdBy;
 
   const SignupResponse({
     required this.userId,
@@ -12,6 +13,7 @@ class SignupResponse {
     required this.email,
     required this.role,
     required this.isActive,
+    this.createdBy,
   });
 
   factory SignupResponse.fromJson(Map<String, dynamic> rawJson) {
@@ -25,6 +27,7 @@ class SignupResponse {
       email: (data['email'] ?? '').toString(),
       role: (data['roleName'] ?? '').toString(),
       isActive: data['active'] as bool? ?? false,
+      createdBy: data['createdBy']?.toString(),
     );
   }
 }

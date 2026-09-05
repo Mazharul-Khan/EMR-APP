@@ -13,6 +13,7 @@ class CreateUserUsecase {
     required String email,
     required String password,
     required UserRole role,
+    String? createdBy,
   }) {
     return repository.createUser(
       token: token,
@@ -20,6 +21,7 @@ class CreateUserUsecase {
       email: email,
       password: password,
       role: role,
+      createdBy: createdBy,
     );
   }
 }

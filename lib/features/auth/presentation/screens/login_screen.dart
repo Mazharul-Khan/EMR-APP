@@ -2,6 +2,8 @@ import 'package:emr_app/core/themes/app_colors.dart';
 import 'package:emr_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:emr_app/features/auth/presentation/bloc/auth_event.dart';
 import 'package:emr_app/features/auth/presentation/bloc/auth_state.dart';
+import 'package:emr_app/features/admin/presentation/screens/admin_home_screen.dart';
+import 'package:emr_app/features/auth/domain/entities/user.dart';
 import 'package:emr_app/features/home/presentation/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -140,7 +142,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   'Electronic Medical Record',
                   style: TextStyle(
                     fontSize: 14,
-                    color: Color(0xFF64748B),
+                    color: AppColors.textSecondary,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -230,9 +232,13 @@ class _LoginScreenState extends State<LoginScreen> {
               backgroundColor: Colors.green,
             ),
           );
+          final Widget destination = state.session.user.role == UserRole.admin
+              ? AdminHomeScreen(session: state.session)
+              : HomeScreen(session: state.session);
+
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
-              builder: (context) => HomeScreen(session: state.session),
+              builder: (context) => destination,
             ),
           );
         }
@@ -309,13 +315,13 @@ class _LoginScreenState extends State<LoginScreen> {
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: Color(0xFFE2E8F0),
+                              color: AppColors.borderLight,
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: Color(0xFF0062FF),
+                              color: AppColors.primaryBlue,
                               width: 1.5,
                             ),
                           ),
@@ -372,13 +378,13 @@ class _LoginScreenState extends State<LoginScreen> {
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: Color(0xFFE2E8F0),
+                              color: AppColors.borderLight,
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: Color(0xFF0062FF),
+                              color: AppColors.primaryBlue,
                               width: 1.5,
                             ),
                           ),
@@ -535,7 +541,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildFooterBar() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-      color: const Color.fromARGB(255, 224, 224, 224),
+      color: AppColors.footerBackground,
       child: LayoutBuilder(
         builder: (context, constraints) {
           final isCompact = constraints.maxWidth < 950;
@@ -544,7 +550,7 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Text(
                 'Version 1.0.0   |   © 2025 EMR System',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
               ),
             );
           }
@@ -553,44 +559,44 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               const Text(
                 'Version 1.0.0   |   © 2025 Your Organization',
-                style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
               ),
               Row(
                 children: [
-                  const Icon(Icons.language, size: 16, color: Color(0xFF64748B)),
+                  const Icon(Icons.language, size: 16, color: AppColors.textSecondary),
                   const SizedBox(width: 6),
                   const Text(
                     'English',
-                    style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                    style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
                   ),
                   const Icon(
                     Icons.arrow_drop_down,
                     size: 18,
-                    color: Color(0xFF64748B),
+                    color: AppColors.textSecondary,
                   ),
                   const SizedBox(width: 20),
-                  const Text(' | ', style: TextStyle(color: Color(0xFFCBD5E1))),
+                  const Text(' | ', style: TextStyle(color: AppColors.borderMedium)),
                   const SizedBox(width: 20),
                   const Icon(
                     Icons.help_outline,
                     size: 16,
-                    color: Color(0xFF64748B),
+                    color: AppColors.textSecondary,
                   ),
                   const SizedBox(width: 6),
                   const Text(
                     'Help',
-                    style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                    style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
                   ),
                   const SizedBox(width: 20),
                   const Icon(
                     Icons.headset_mic_outlined,
                     size: 16,
-                    color: Color(0xFF64748B),
+                    color: AppColors.textSecondary,
                   ),
                   const SizedBox(width: 6),
                   const Text(
                     'Contact Support',
-                    style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                    style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
                   ),
                 ],
               ),

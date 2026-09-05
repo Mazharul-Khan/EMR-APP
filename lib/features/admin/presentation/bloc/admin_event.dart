@@ -6,8 +6,12 @@ abstract class AdminEvent {
 
 class FetchUsersEvent extends AdminEvent {
   final String token;
+  final bool isSilent;
 
-  const FetchUsersEvent({required this.token});
+  const FetchUsersEvent({
+    required this.token,
+    this.isSilent = false,
+  });
 }
 
 class ToggleUserStatusEvent extends AdminEvent {
@@ -28,6 +32,7 @@ class CreateUserEvent extends AdminEvent {
   final String email;
   final String password;
   final UserRole role;
+  final String? createdBy;
 
   const CreateUserEvent({
     required this.token,
@@ -35,10 +40,16 @@ class CreateUserEvent extends AdminEvent {
     required this.email,
     required this.password,
     required this.role,
+    this.createdBy,
   });
 }
 
 class SearchUsersEvent extends AdminEvent {
   final String query;
   const SearchUsersEvent(this.query);
+}
+
+class FilterByRoleEvent extends AdminEvent {
+  final String role;
+  const FilterByRoleEvent(this.role);
 }

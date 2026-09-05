@@ -10,6 +10,7 @@ class AdminUserModel {
   final String role;
   final bool active;
   final DateTime? createdAt;
+  final String? createdBy;
 
   const AdminUserModel({
     required this.userId,
@@ -18,6 +19,7 @@ class AdminUserModel {
     required this.role,
     required this.active,
     this.createdAt,
+    this.createdBy,
   });
 
   factory AdminUserModel.fromJson(Map<String, dynamic> json) {
@@ -30,6 +32,7 @@ class AdminUserModel {
       createdAt: json['createdAt'] != null
           ? DateTime.tryParse(json['createdAt'].toString())
           : null,
+      createdBy: json['createdBy']?.toString(),
     );
   }
 
@@ -41,6 +44,7 @@ class AdminUserModel {
       role: UserRole.fromString(role),
       isActive: active,
       createdAt: createdAt ?? DateTime.now(),
+      createdBy: createdBy,
     );
   }
 }

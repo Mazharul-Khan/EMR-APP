@@ -2,6 +2,8 @@ import 'package:emr_app/core/themes/app_colors.dart';
 import 'package:emr_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:emr_app/features/auth/presentation/bloc/auth_event.dart';
 import 'package:emr_app/features/auth/presentation/bloc/auth_state.dart';
+import 'package:emr_app/features/admin/presentation/screens/admin_home_screen.dart';
+import 'package:emr_app/features/auth/domain/entities/user.dart';
 import 'package:emr_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:emr_app/features/home/presentation/screens/home_screen.dart';
 import 'package:flutter/material.dart';
@@ -57,11 +59,15 @@ class _SplashScreenState extends State<SplashScreen>
     if (!mounted) return;
 
     if (state is AuthSuccess) {
-      debugPrint('✅ Token is valid! Routing to Home Screen...');
+      debugPrint('✅ Token is valid! Routing to Dashboard...');
+      final Widget destination = state.session.user.role == UserRole.admin
+          ? AdminHomeScreen(session: state.session)
+          : HomeScreen(session: state.session);
+
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
           transitionDuration: const Duration(milliseconds: 600),
-          pageBuilder: (_, animation, secondaryAnimation) => HomeScreen(session: state.session),
+          pageBuilder: (_, animation, secondaryAnimation) => destination,
           transitionsBuilder: (_, animation, secondaryAnimation, child) {
             return FadeTransition(opacity: animation, child: child);
           },
@@ -122,7 +128,7 @@ class _SplashScreenState extends State<SplashScreen>
                                 shape: BoxShape.circle,
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(0x1F0062FF),
+                                    color: AppColors.splashGlow1,
                                     blurRadius: 24,
                                     spreadRadius: 4,
                                     offset: const Offset(0, 8),
@@ -155,7 +161,7 @@ class _SplashScreenState extends State<SplashScreen>
                               'Electronic Medical Record',
                               style: TextStyle(
                                 fontSize: 15,
-                                color: const Color(0xFF64748B),
+                                color: AppColors.textSecondary,
                                 fontWeight: FontWeight.w500,
                                 letterSpacing: 0.5,
                               ),
@@ -170,7 +176,7 @@ class _SplashScreenState extends State<SplashScreen>
                                 vertical: 5,
                               ),
                               decoration: BoxDecoration(
-                                color: const Color(0x150062FF),
+                                color: AppColors.splashGlow2,
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: const Text(
@@ -178,7 +184,7 @@ class _SplashScreenState extends State<SplashScreen>
                                 style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w700,
-                                  color: Color(0xFF0062FF),
+                                  color: AppColors.primaryBlue,
                                   letterSpacing: 1.1,
                                 ),
                               ),
@@ -195,8 +201,8 @@ class _SplashScreenState extends State<SplashScreen>
                                     borderRadius: BorderRadius.circular(10),
                                     child: const LinearProgressIndicator(
                                       minHeight: 5,
-                                      backgroundColor: Color(0xFFE2E8F0),
-                                      color: Color(0xFF0062FF),
+                                      backgroundColor: AppColors.borderLight,
+                                      color: AppColors.primaryBlue,
                                     ),
                                   ),
                                   const SizedBox(height: 14),
@@ -204,7 +210,7 @@ class _SplashScreenState extends State<SplashScreen>
                                     'Verifying session credentials...',
                                     style: TextStyle(
                                       fontSize: 13,
-                                      color: Color(0xFF64748B),
+                                      color: AppColors.textSecondary,
                                       fontWeight: FontWeight.w400,
                                     ),
                                   ),
@@ -231,14 +237,14 @@ class _SplashScreenState extends State<SplashScreen>
                         Icon(
                           Icons.verified_user_outlined,
                           size: 16,
-                          color: Color(0xFF0062FF),
+                          color: AppColors.primaryBlue,
                         ),
                         SizedBox(width: 6),
                         Text(
                           '256-Bit Encrypted & HIPAA Compliant System',
                           style: TextStyle(
                             fontSize: 12,
-                            color: Color(0xFF94A3B8),
+                            color: AppColors.textMuted,
                             fontWeight: FontWeight.w500,
                           ),
                         ),

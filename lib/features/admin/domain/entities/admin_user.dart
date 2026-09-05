@@ -7,6 +7,7 @@ class AdminUser {
   final UserRole role;
   final bool isActive;
   final DateTime? createdAt;
+  final String? createdBy;
 
   const AdminUser({
     required this.userId,
@@ -15,6 +16,7 @@ class AdminUser {
     required this.role,
     required this.isActive,
     required this.createdAt,
+    this.createdBy,
   });
 
   AdminUser copyWith({
@@ -24,6 +26,7 @@ class AdminUser {
     UserRole? role,
     bool? isActive,
     DateTime? createdAt,
+    String? createdBy,
   }) {
     return AdminUser(
       userId: userId ?? this.userId,
@@ -32,6 +35,7 @@ class AdminUser {
       role: role ?? this.role,
       isActive: isActive ?? this.isActive,
       createdAt: createdAt ?? this.createdAt,
+      createdBy: createdBy ?? this.createdBy,
     );
   }
 }

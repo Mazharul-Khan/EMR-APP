@@ -35,13 +35,15 @@ class AdminRepositoryImpl implements AdminRepository {
     required String email,
     required String password,
     required UserRole role,
+    String? createdBy,
   }) async {
     final response = await remoteDatasource.createUser(
       token,
       userName,
       email,
       password,
-      role.name,
+      role.name.toUpperCase(),
+      createdBy: createdBy,
     );
     return AdminUser(
       userId: response.userId,
@@ -50,6 +52,20 @@ class AdminRepositoryImpl implements AdminRepository {
       role: UserRole.fromString(response.role),
       isActive: response.isActive,
       createdAt: DateTime.now(),
+      createdBy: response.createdBy ?? createdBy,
     );
+  }
+
+  @override
+  Future<List<String>> getRoles({required String token}) async {
+    return await remoteDatasource.getRoles(token);
+  }
+
+  @override
+  Future<bool> verifyPassword({
+    required String token,
+    required String password,
+  }) async {
+    return await remoteDatasource.verifyPassword(token, password);
   }
 }

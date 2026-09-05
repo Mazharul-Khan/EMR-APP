@@ -11,16 +11,24 @@ class AdminLoading extends AdminState {}
 class AdminLoaded extends AdminState {
   final List<AdminUser> users;
   final List<AdminUser> filteredUsers;
+  final List<String> roles;
+  final String selectedRole;
   final String searchQuery;
   final bool isActionLoading;
+  final bool isSyncing;
+  final DateTime? lastSyncedAt;
   final String? successMessage;
   final String? errorMessage;
 
   const AdminLoaded({
     required this.users,
     required this.filteredUsers,
+    this.roles = const [],
+    this.selectedRole = 'All',
     this.searchQuery = '',
     this.isActionLoading = false,
+    this.isSyncing = false,
+    this.lastSyncedAt,
     this.successMessage,
     this.errorMessage,
   });
@@ -36,16 +44,24 @@ class AdminLoaded extends AdminState {
   AdminLoaded copyWith({
     List<AdminUser>? users,
     List<AdminUser>? filteredUsers,
+    List<String>? roles,
+    String? selectedRole,
     String? searchQuery,
     bool? isActionLoading,
+    bool? isSyncing,
+    DateTime? lastSyncedAt,
     String? successMessage,
     String? errorMessage,
   }) {
     return AdminLoaded(
       users: users ?? this.users,
       filteredUsers: filteredUsers ?? this.filteredUsers,
+      roles: roles ?? this.roles,
+      selectedRole: selectedRole ?? this.selectedRole,
       searchQuery: searchQuery ?? this.searchQuery,
       isActionLoading: isActionLoading ?? this.isActionLoading,
+      isSyncing: isSyncing ?? this.isSyncing,
+      lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
       successMessage: successMessage,
       errorMessage: errorMessage,
     );

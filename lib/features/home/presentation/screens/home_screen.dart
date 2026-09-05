@@ -56,8 +56,8 @@ class HomeScreen extends StatelessWidget {
                   context.read<AuthBloc>().add(LogoutRequested());
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFEE2E2),
-                  foregroundColor: const Color(0xFFDC2626),
+                  backgroundColor: AppColors.errorRedBadgeBg,
+                  foregroundColor: AppColors.errorRedDark,
                   elevation: 0,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -117,15 +117,15 @@ class HomeScreen extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppColors.brightBlue, const Color(0xFF1E40AF)],
+        gradient: const LinearGradient(
+          colors: [AppColors.brightBlue, AppColors.primaryBlueDark],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x290062FF),
+            color: AppColors.primaryBlueShadow,
             blurRadius: 16,
             offset: Offset(0, 6),
           ),
@@ -135,7 +135,7 @@ class HomeScreen extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 32,
-            backgroundColor: const Color(0x33FFFFFF),
+            backgroundColor: AppColors.whiteTranslucent20,
             child: Text(
               userName.isNotEmpty ? userName[0].toUpperCase() : 'U',
               style: const TextStyle(
@@ -167,7 +167,7 @@ class HomeScreen extends StatelessWidget {
                         vertical: 3,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0x40FFFFFF),
+                        color: AppColors.whiteTranslucent25,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
@@ -187,7 +187,7 @@ class HomeScreen extends StatelessWidget {
                   user?.email ?? 'Active Session Token Verified',
                   style: const TextStyle(
                     fontSize: 14,
-                    color: Color(0xE6FFFFFF),
+                    color: AppColors.whiteTranslucent90,
                   ),
                 ),
               ],
@@ -204,7 +204,7 @@ class HomeScreen extends StatelessWidget {
 
     return Card(
       elevation: 4,
-      shadowColor: const Color(0x260062FF),
+      shadowColor: AppColors.primaryBlueShadowSubtle,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       color: Colors.white,
       child: Padding(
@@ -217,7 +217,7 @@ class HomeScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFEFF6FF),
+                    color: AppColors.primaryBlueSoft,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
@@ -238,7 +238,7 @@ class HomeScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 20),
-            const Divider(color: Color(0xFFE2E8F0)),
+            const Divider(color: AppColors.borderLight),
             const SizedBox(height: 16),
 
             _buildDetailRow(
@@ -353,7 +353,7 @@ class HomeScreen extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.lightGray,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFE2E8F0)),
+            border: Border.all(color: AppColors.borderLight),
           ),
           child: SelectableText(
             token,
@@ -375,7 +375,7 @@ class HomeScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: AppColors.borderLight),
       ),
       child: Column(
         children: [
@@ -396,7 +396,7 @@ class HomeScreen extends StatelessWidget {
                 context.read<AuthBloc>().add(LogoutRequested());
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFDC2626),
+                backgroundColor: AppColors.errorRedDark,
                 foregroundColor: Colors.white,
                 elevation: 0,
                 shape: RoundedRectangleBorder(

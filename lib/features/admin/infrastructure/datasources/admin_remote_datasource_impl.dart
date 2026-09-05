@@ -64,8 +64,9 @@ class AdminRemoteDatasourceImpl implements AdminRemoteDatasource {
     String userName,
     String email,
     String password,
-    String role,
-  ) async {
+    String role, {
+    String? createdBy,
+  }) async {
     try {
       final response = await apiClient.dio.post(
         'auth/signup',
@@ -73,7 +74,8 @@ class AdminRemoteDatasourceImpl implements AdminRemoteDatasource {
           'userName': userName,
           'email': email,
           'password': password,
-          'role': role,
+          'role': role.toUpperCase().trim(),
+          if (createdBy != null && createdBy.isNotEmpty) 'createdBy': createdBy,
         },
       );
       final dynamic body = response.data;
@@ -84,6 +86,51 @@ class AdminRemoteDatasourceImpl implements AdminRemoteDatasource {
     } on DioException catch (e) {
       final errorMsg =
           e.response?.data?['message'] ?? e.message ?? 'Failed to create user';
+      throw Exception(errorMsg);
+    }
+  }
+
+  @override
+  Future<List<String>> getRoles(String token) async {
+    try {
+      final response = await apiClient.dio.get('admin/users/roles');
+      final dynamic body = response.data;
+      List<dynamic> list = [];
+
+      if (body is Map && body['data'] is List) {
+        list = body['data'] as List;
+      } else if (body is List) {
+        list = body;
+      }
+
+      return list.map((item) => item.toString()).toList();
+    } on DioException catch (e) {
+      final errorMsg =
+          e.response?.data?['message'] ?? e.message ?? 'Failed to fetch roles';
+      throw Exception(errorMsg);
+    }
+  }
+
+  @override
+  Future<bool> verifyPassword(String token, String password) async {
+    try {
+      final response = await apiClient.dio.post(
+        'auth/verify-password',
+        data: {
+          'token': token,
+          'password': password,
+        },
+      );
+      final dynamic body = response.data;
+      if (body is Map && body['success'] == true) {
+        return true;
+      }
+      return false;
+    } on DioException catch (e) {
+      final errorMsg = e.response?.data?['message'] ??
+          (e.response?.statusCode == 401
+              ? 'Incorrect password. Verification failed.'
+              : e.message ?? 'Password verification failed');
       throw Exception(errorMsg);
     }
   }

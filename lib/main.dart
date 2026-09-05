@@ -1,4 +1,13 @@
+import 'package:emr_app/core/themes/app_colors.dart';
 import 'package:emr_app/core/utils/app_bloc_observer.dart';
+import 'package:emr_app/features/admin/domain/usecases/create_user_usecase.dart';
+import 'package:emr_app/features/admin/domain/usecases/get_all_users_usecase.dart';
+import 'package:emr_app/features/admin/domain/usecases/get_roles_usecase.dart';
+import 'package:emr_app/features/admin/domain/usecases/toggle_user_status_usecase.dart';
+import 'package:emr_app/features/admin/domain/usecases/verify_password_usecase.dart';
+import 'package:emr_app/features/admin/infrastructure/adapters/admin_repository_impl.dart';
+import 'package:emr_app/features/admin/infrastructure/datasources/admin_remote_datasource_impl.dart';
+import 'package:emr_app/features/admin/presentation/bloc/admin_bloc.dart';
 import 'package:emr_app/features/auth/domain/usecases/get_cached_token_usecase.dart';
 import 'package:emr_app/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:emr_app/features/auth/infrastructure/datasources/auth_local_datasource_impl.dart';
@@ -29,23 +38,40 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     // Initialize dependencies
     final apiClient = ApiClient();
+
     final authDatasource = AuthRemoteDatasourceImpl(apiClient);
     final localDatasource = AuthLocalDatasourceImpl(sharedPreferences);
     final authRepository = AuthRepositoryImpl(authDatasource, localDatasource);
 
-    return BlocProvider<AuthBloc>(
-      create: (context) => AuthBloc(
-        loginUsecase: LoginUsecase(authRepository),
-        signupUsecase: SignupUsecase(authRepository),
-        loginWithTokenUsecase: LoginWithTokenUsecase(authRepository),
-        cachedTokenUsecase: GetCachedTokenUsecase(authRepository),
-        logoutUsecase: LogoutUsecase(authRepository),
-      ),
+    final adminDatasource = AdminRemoteDatasourceImpl(apiClient);
+    final adminRepository = AdminRepositoryImpl(adminDatasource);
+
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthBloc>(
+          create: (context) => AuthBloc(
+            loginUsecase: LoginUsecase(authRepository),
+            signupUsecase: SignupUsecase(authRepository),
+            loginWithTokenUsecase: LoginWithTokenUsecase(authRepository),
+            cachedTokenUsecase: GetCachedTokenUsecase(authRepository),
+            logoutUsecase: LogoutUsecase(authRepository),
+          ),
+        ),
+        BlocProvider<AdminBloc>(
+          create: (context) => AdminBloc(
+            getAllUsersUsecase: GetAllUsersUsecase(adminRepository),
+            toggleUserStatusUsecase: ToggleUserStatusUsecase(adminRepository),
+            createUserUsecase: CreateUserUsecase(adminRepository),
+            getRolesUsecase: GetRolesUsecase(adminRepository),
+            verifyPasswordUsecase: VerifyPasswordUsecase(adminRepository),
+          ),
+        ),
+      ],
       child: MaterialApp(
         title: 'EMR App',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF0062FF)),
+          colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primaryBlue),
           useMaterial3: true,
         ),
         home: const SplashScreen(),

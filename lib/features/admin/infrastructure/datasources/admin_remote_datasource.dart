@@ -15,6 +15,11 @@ abstract class AdminRemoteDatasource {
     String userName,
     String email,
     String password,
-    String role,
-  );
+    String role, {
+    String? createdBy,
+  });
+
+  Future<List<String>> getRoles(String token);
+
+  Future<bool> verifyPassword(String token, String password);
 }

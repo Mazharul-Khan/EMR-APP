@@ -16,5 +16,13 @@ abstract class AdminRepository {
     required String email,
     required String password,
     required UserRole role,
+    String? createdBy,
+  });
+
+  Future<List<String>> getRoles({required String token});
+
+  Future<bool> verifyPassword({
+    required String token,
+    required String password,
   });
 }

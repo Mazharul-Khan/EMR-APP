@@ -43,7 +43,7 @@ class DoctorHomeScreen extends StatelessWidget {
         actions: [
           IconButton(
             tooltip: 'Logout',
-            icon: const Icon(Icons.logout, color: Color(0xFFDC2626)),
+            icon: const Icon(Icons.logout, color: AppColors.errorRedDark),
             onPressed: () {
               context.read<AuthBloc>().add(LogoutRequested());
             },
@@ -103,7 +103,7 @@ class DoctorHomeScreen extends StatelessWidget {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE0E7FF),
+                  color: AppColors.roleDoctorIndigoBg,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: const Text(
@@ -111,7 +111,7 @@ class DoctorHomeScreen extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF4338CA),
+                    color: AppColors.roleDoctorIndigo,
                   ),
                 ),
               ),
